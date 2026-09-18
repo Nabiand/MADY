@@ -85,6 +85,7 @@
             position: relative;
             min-height: 100vh;
             justify-content: center;
+            overflow: visible;
         }
         .activa {
             display: flex;
@@ -168,12 +169,14 @@
             align-items: center;
             width: 100%;
             max-width: 1200px;
-            height: 420px;
-            overflow: hidden;
+            height: clamp(240px, 42vh, 520px);
+            overflow: visible;
         }
         .girasol {
             font-size: 100px;
             line-height: 1;
+            position: relative;
+            z-index: 1;
             transition: font-size 1.8s cubic-bezier(0.22, 1, 0.36, 1),
                         filter 1.2s ease,
                         transform 1.2s ease,
@@ -252,6 +255,7 @@
             gap: 18px;
             width: min(88vw, 560px);
             margin: 0 auto;
+            padding: 18px 0 12px;
             position: relative;
             z-index: 6;
         }
@@ -298,6 +302,9 @@
             justify-content: center;
             width: min(90vw, 620px);
             margin-top: 10px;
+            position: relative;
+            z-index: 20;
+            isolation: isolate;
         }
 
         #textoPregunta {
@@ -313,6 +320,8 @@
                          0 3px 0 rgba(172, 90, 150, 0.8);
             -webkit-text-stroke: 0.5px rgba(160, 80, 136, 0.7);
             max-width: 100%;
+            position: relative;
+            z-index: 21;
         }
 
         #zonaPreguntas input,
@@ -329,6 +338,7 @@
         @media (max-width: 600px) {
             body {
                 padding: 18px 0;
+                overflow-x: hidden;
             }
 
             .pantalla {
@@ -337,8 +347,9 @@
 
             .contenedor-flor {
                 max-width: 100%;
-                height: 260px;
+                height: clamp(220px, 42vh, 340px);
                 margin: 10px 0;
+                overflow: visible;
             }
 
             h1, h2 {
@@ -361,17 +372,18 @@
             .centro-flor {
                 width: min(78vw, 320px);
                 padding: 16px;
+                top: 50%;
             }
 
             .final-content {
-                top: 48%;
                 gap: 12px;
                 width: min(88vw, 420px);
+                padding-top: 10px;
             }
 
             .foto-final {
-                width: 100%;
-                max-width: 320px;
+                width: min(82vw, 330px);
+                max-width: 330px;
                 border-radius: 18px;
             }
 
@@ -485,23 +497,33 @@
             document.getElementById("girasolCreciendo").style.fontSize = "150px"; // tamaño inicial elegante
         }
 
+        function normalizarRespuesta(valor) {
+            return valor
+                .trim()
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/\s+/g, " ");
+        }
+
         function verificarPregunta() {
-            let res = document.getElementById("respuestaInput").value.trim().toLowerCase();
+            let res = normalizarRespuesta(document.getElementById("respuestaInput").value);
+            let respuestas = [respuesta1, respuesta2, respuesta3].map(normalizarRespuesta);
             let girasol = document.getElementById("girasolCreciendo");
             
-            if(nivelActual === 0 && res === respuesta1) {
+            if(nivelActual === 0 && res === respuestas[0]) {
                 nivelActual++;
                 girasol.style.fontSize = "250px";
                 document.getElementById("textoPregunta").innerText = preguntas[1];
                 document.getElementById("respuestaInput").value = "";
             } 
-            else if(nivelActual === 1 && res === respuesta2) {
+            else if(nivelActual === 1 && res === respuestas[1]) {
                 nivelActual++;
                 girasol.style.fontSize = "420px";
                 document.getElementById("textoPregunta").innerText = preguntas[2];
                 document.getElementById("respuestaInput").value = "";
             }
-            else if(nivelActual === 2 && res === respuesta3) {
+            else if(nivelActual === 2 && res === respuestas[2]) {
                 girasol.style.fontSize = "650px";
                 document.getElementById("zonaPreguntas").style.display = "none";
                 
